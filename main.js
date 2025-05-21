@@ -82,7 +82,7 @@ const initializeButtons = () =>
 }
 
 
-function startNewGame()
+const startNewGame = () =>
 {
     shuffle(arr);
     initializeButtons();
