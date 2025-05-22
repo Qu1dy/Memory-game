@@ -1,12 +1,18 @@
 const startButton = document.querySelector("#start");
-const arrCardsElements = document.getElementsByClassName("card");
+const arrCardsElements = document.querySelectorAll(".card");
 const icons = ["computer", "cloud", "sunny", "umbrella", "house", "rocket", "egg", "school"];
-let arr = [];
+let cardIcons = [];
 let pairsFound;
 let selected = [];
-arr = [...icons.slice(0, 8), ...icons.slice(0, 8)];
 
-function shuffle(array) {
+
+const prepareIcons = () =>
+{
+    cardIcons = [...icons.slice(0, 8), ...icons.slice(0, 8)];
+    shuffle(cardIcons);
+}
+
+const shuffle = (array) => {
   let currentIndex = array.length;
 
   while (currentIndex) {
@@ -18,14 +24,6 @@ function shuffle(array) {
   }
 }
 
-const replaceClass = (target, removeClass, addClass) => {
-    const updateClass = (el) => {
-        el.classList.remove(removeClass);
-        el.classList.add(addClass);
-    }
-
-    Array.isArray(target) ? target.forEach(updateClass) : updateClass(target);
-}
 
 const manage = async (card, i) =>
 {
@@ -33,48 +31,48 @@ const manage = async (card, i) =>
 
     selected.push(card);
     showCard(card, i);
+
     await new Promise(r => setTimeout(r, 200));
+
     if(selected.length < 2) return;
+
     if(arePairs(selected))
     {
         pairsFound++;
-        replaceClass(selected, "match", "found");
-        console.log(selected.length);
+        selected.forEach(card => card.classList.replace("match", "found"));
     }
     else
     {
         selected.forEach(card => card.innerHTML = "");
-        replaceClass(selected, "match", "hidden");
+        selected.forEach(card => card.classList.replace("match", "hidden"));
     }
+
     if(didWin()) alert("You won!");
+
     selected = [];
 }
 
 
 
-const didWin = () =>
-{
-    return pairsFound == arrCardsElements.length/2;
-}
+const didWin = () => pairsFound === arrCardsElements.length/2;
 
 
-const arePairs = ([firstCard, secondCard]) => {
-    return firstCard.innerHTML == secondCard.innerHTML;
-}
+const arePairs = ([firstCard, secondCard]) => firstCard.innerHTML === secondCard.innerHTML;
+
 
 
 const showCard = (card, ind) =>
 {
-    card.innerHTML = `<i class="material-icons">${arr[ind]}</i>`;
-    replaceClass(card, "hidden", "match")
+    card.innerHTML = `<i class="material-icons">${cardIcons[ind]}</i>`;
+    card.classList.replace("hidden", "match");
 }
 
 
-const initializeButtons = () =>
+const initializeCards = () =>
 {
-    [...arrCardsElements].forEach((card, i) =>
+    arrCardsElements.forEach((card, i) =>
     { 
-        card.innerHTML = null;
+        card.innerHTML = "";
         card.classList.remove("found", "match");
         card.classList.add("hidden");
         card.onclick = () => manage(card, i)
@@ -84,10 +82,11 @@ const initializeButtons = () =>
 
 const startNewGame = () =>
 {
-    shuffle(arr);
-    initializeButtons();
+    prepareIcons();
+    initializeCards();
     pairsFound = 0;
     selected = [];
+    startButton.innerText = "Restart";
 }
 
 startButton.onclick = startNewGame;
